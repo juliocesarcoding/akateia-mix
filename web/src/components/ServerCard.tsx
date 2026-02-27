@@ -1,5 +1,6 @@
 "use client";
 
+import { useServerLive } from "@/hooks/useServerLive";
 import { useMemo, useState } from "react";
 
 export type ServerMode = "MIX" | "RETAKE" | "DM";
@@ -9,9 +10,11 @@ export type ServerDTO = {
   name: string;
   ip: string;
   port: number;
+  password: string;
   mode: ServerMode;
   region?: string | null;
   isActive: boolean;
+  playerCount?: number | null;
 };
 
 function modeLabel(mode: ServerMode) {
@@ -43,10 +46,13 @@ function modePillClasses(mode: ServerMode) {
 
 export default function ServerCard({ server }: { server: ServerDTO }) {
   const [copied, setCopied] = useState(false);
+  const live = useServerLive(server.id);
+
+  const playerCount = live?.playerCount ?? server.playerCount ?? 0;
+  const online = live?.online ?? true;
 
   const address = useMemo(() => `${server.ip}:${server.port}`, [server.ip, server.port]);
-  const connectCmd = useMemo(() => `connect ${address}`, [address]);
-  const cs2Url = useMemo(() => `steam://connect/${address}`, [address]);
+  const connectCmd = useMemo(() => `connect ${address}; password ${server.password}`, [address, server.password]);
 
   async function handleCopy() {
     try {
@@ -86,26 +92,28 @@ export default function ServerCard({ server }: { server: ServerDTO }) {
               {modeLabel(server.mode)}
             </span>
 
-            {server.region ? (
-              <span className="inline-flex items-center rounded-full bg-white/5 px-2.5 py-1 text-xs font-medium text-zinc-200 ring-1 ring-inset ring-white/10">
-                {server.region}
-              </span>
-            ) : null}
+
 
             <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${statusClasses}`}>
               {statusText}
             </span>
-          </div>
 
+          </div>
+          <div className="mt-2 flex items-center gap-2">
+            <span className={`h-2 w-2 rounded-full ${online ? "bg-emerald-400" : "bg-zinc-600"}`} />
+            <p className="text-sm text-orange-400 font-medium">
+              {playerCount > 1 ? `${playerCount} jogadores` : `${playerCount} jogador`}
+            </p>
+          </div>
           <div className="mt-4">
             <p className="text-xs text-zinc-400">Endereço</p>
             <p className="mt-1 font-mono text-sm text-zinc-100">{address}</p>
-            <p className="mt-1 font-mono text-xs text-zinc-400">{connectCmd}</p>
+            {/* <p className="mt-1 font-mono text-xs text-zinc-400">{connectCmd}</p> */}
           </div>
         </div>
 
         <div className="flex shrink-0 flex-col gap-2">
-          <a
+          {/* <a
             href={cs2Url}
             className={`inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-semibold text-black active:scale-[0.99] ${server.isActive
               ? "bg-gradient-to-r from-orange-500 to-amber-400 hover:from-orange-400 hover:to-amber-300"
@@ -114,7 +122,7 @@ export default function ServerCard({ server }: { server: ServerDTO }) {
             title={server.isActive ? "Abrir CS2 e conectar" : "Servidor offline"}
           >
             Abrir no CS2
-          </a>
+          </a> */}
 
           <button
             onClick={handleCopy}
@@ -127,7 +135,7 @@ export default function ServerCard({ server }: { server: ServerDTO }) {
 
       <div className="relative mt-4 border-t border-white/10 pt-4">
         <p className="text-xs text-zinc-400">
-          Dica: console do CS2 → <span className="font-mono text-zinc-200">{connectCmd}</span>
+          Dica: console do CS2 → <span className="font-mono text-zinc-200">CTRL + V</span>
         </p>
       </div>
     </div>

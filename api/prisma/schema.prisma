@@ -10,7 +10,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  
   url      = env("DATABASE_URL")
 }
 enum ServerMode {
@@ -24,6 +23,7 @@ model Server {
   name         String
   ip           String
   port         Int
+  password    String
   mode         ServerMode @default(RETAKE)
   region       String?
   isActive     Boolean    @default(true)

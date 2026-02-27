@@ -9,6 +9,7 @@ async function main() {
       name: 'AK Teia Server 24/7',
       ip: '177.54.146.23',
       port: 27123,
+      password: '940651',
       mode: ServerMode.RETAKE,
       region: 'br-sp',
       isActive: true,

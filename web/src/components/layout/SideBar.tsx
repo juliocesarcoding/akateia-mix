@@ -22,11 +22,11 @@ export default function Sidebar({ discordUrl }: { discordUrl: string }) {
   const items: NavItem[] = useMemo(
     () => [
       { label: "Início", href: "/queue" },
-      { label: "Seja Premium", href: "/premium", badge: "NEW" },
+      { label: "Seja Premium", href: "/seja-premium", badge: "NEW" },
       { label: "Ajuda", href: "/ajuda" },
-      { label: "Discord", href: discordUrl, external: true },
+      { label: "Discord", href: "/discord" },
     ],
-    [discordUrl]
+    []
   );
 
   function isActive(item: NavItem) {

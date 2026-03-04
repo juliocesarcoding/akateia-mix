@@ -2,20 +2,23 @@
 
 import { useEffect, useMemo, useState } from "react";
 import ServerCard, { ServerDTO } from "./ServerCard";
+import { useServersLive } from "@/hooks/useServerLive";
 
 export default function ServersSection({
   apiUrl,
+  token,
   title = "Servidores",
   subtitle = "Aquece no Retake enquanto o mix fecha.",
 }: {
   apiUrl: string;
+  token: string;
   title?: string;
   subtitle?: string;
 }) {
   const [servers, setServers] = useState<ServerDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const liveData = useServersLive();
   useEffect(() => {
     if (!apiUrl) return;
 
@@ -30,7 +33,7 @@ export default function ServersSection({
       try {
         const res = await fetch(`${apiUrl}/servers`, {
           method: "GET",
-          credentials: "include",
+          headers: { Authorization: `Bearer ${token}` },
           cache: "no-store",
         });
 
@@ -83,7 +86,7 @@ export default function ServersSection({
               <h3 className="mb-3 text-sm font-semibold text-zinc-200">Retake</h3>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {serversByMode.retake.map((s) => (
-                  <ServerCard key={s.id} server={s} />
+                  <ServerCard key={s.id} server={s} live={liveData[s.id]} />
                 ))}
               </div>
             </section>

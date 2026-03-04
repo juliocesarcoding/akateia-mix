@@ -33,16 +33,10 @@ export class ServersController {
     };
   }
   // ✅ “ao vivo”: /servers/:id/live
-  @Sse(':id/live')
-  live(@Param('id') id: string): Observable<MessageEvent> {
-    // a cada 2s atualiza (ajuste o intervalo)
-    return interval(2000).pipe(
-      switchMap(() => from(this.monitor.refreshServer(id))),
-      // só emite se mudar playerCount/online (evita spam no front)
-      distinctUntilChanged(
-        (a, b) => a.playerCount === b.playerCount && a.online === b.online,
-      ),
-      map((data) => ({ data }) as MessageEvent),
+  @Sse('live')
+  live(): Observable<MessageEvent> {
+    return interval(1000).pipe(
+      map(() => ({ data: this.monitor.getAll() }) as any),
     );
   }
 }

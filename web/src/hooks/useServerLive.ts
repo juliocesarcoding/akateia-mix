@@ -2,38 +2,43 @@
 
 import { useEffect, useState } from "react";
 
-type Live = {
+type ServerLive = {
  serverId: string;
  playerCount: number;
  updatedAt: number;
  online: boolean;
 };
 
-export function useServerLive(serverId: string) {
+export function useServersLive() {
  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
- const [live, setLive] = useState<Live | null>(null);
+ const [data, setData] = useState<Record<string, ServerLive>>({});
 
  useEffect(() => {
-  if (!serverId) return;
+  const es = new EventSource(`${apiUrl}/servers/live`, {
+   withCredentials: true,
+  });
 
-  const url = `${apiUrl}/servers/${serverId}/live`;
-  const es = new EventSource(url, { withCredentials: true });
-
-  es.onmessage = (ev) => {
+  es.onmessage = (event) => {
    try {
-    const data = JSON.parse(ev.data);
-    setLive(data);
-   } catch {
-    // se o Nest já mandar objeto, pode vir direto stringificado de forma diferente
+    const parsed: ServerLive[] = JSON.parse(event.data);
+
+    const map: Record<string, ServerLive> = {};
+    parsed.forEach((s) => {
+     map[s.serverId] = s;
+    });
+
+    setData(map);
+   } catch (e) {
+    console.error("Erro SSE:", e);
    }
   };
 
   es.onerror = () => {
-   // EventSource tenta reconectar automaticamente
+   console.warn("SSE reconectando...");
   };
 
   return () => es.close();
- }, [apiUrl, serverId]);
+ }, [apiUrl]);
 
- return live;
+ return data;
 }

@@ -3,23 +3,60 @@
 import { useEffect, useState } from "react";
 import ServersSection from "@/components/ServersSection";
 
-type SteamUser = {
-  steamid: string;
-  displayName: string;
-  avatar?: string | null;
+
+
+type User = {
+  id: string;
+  steamId?: string | null;
+  displayName?: string | null;
+  avatarUrl?: string | null;
+  nickname?: string | null;
+  email?: string | null;
+  profileCompleted?: boolean;
 };
 
-type MeResponse = { ok: true; user: SteamUser } | { ok: false; user: null };
+type MeResponse = { ok: true; user: User } | { ok: false; user: null };
+
 
 export default function QueuePage() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
   const [me, setMe] = useState<MeResponse | null>(null);
+  const token =
+    typeof window !== "undefined"
+      ? localStorage.getItem("auth_token")
+      : null;
 
   useEffect(() => {
-    fetch(`${apiUrl}/auth/me`, { method: "GET", credentials: "include" })
-      .then((r) => r.json())
-      .then(setMe)
-      .catch(() => setMe({ ok: false, user: null }));
+    async function run() {
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("auth_token")
+          : null;
+
+      if (!token) {
+        setMe({ ok: false, user: null });
+        return;
+      }
+
+      try {
+        const res = await fetch(`${apiUrl}/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const data = await res.json().catch(() => null);
+
+        if (!res.ok) {
+          setMe({ ok: false, user: null });
+          return;
+        }
+
+        setMe(data);
+      } catch {
+        setMe({ ok: false, user: null });
+      }
+    }
+
+    run();
   }, [apiUrl]);
 
   if (!me) return <div className="min-h-screen bg-black p-6 text-sm text-zinc-400">Carregando...</div>;
@@ -67,8 +104,8 @@ export default function QueuePage() {
 
             <p className="mt-2 text-sm text-zinc-300">
               Logado como{" "}
-              <b className="text-white">{me.user.displayName}</b>{" "}
-              <span className="text-zinc-500">({me.user.steamid})</span>
+              <b className="text-white">{me.user.nickname || me.user.displayName || "Jogador"}</b>
+              <span className="text-zinc-500">({me.user.steamId || "sem steam"})</span>
             </p>
 
             <p className="mt-2 text-sm text-zinc-400">
@@ -94,9 +131,9 @@ export default function QueuePage() {
 
           {/* Avatar / badge */}
           <div className="flex items-center gap-4">
-            {me.user.avatar ? (
+            {me.user.avatarUrl ? (
               <img
-                src={me.user.avatar}
+                src={me.user.avatarUrl}
                 alt="avatar"
                 width={76}
                 height={76}
@@ -110,7 +147,7 @@ export default function QueuePage() {
               <div className="text-xs font-semibold text-zinc-300">Status</div>
               <div className="mt-1 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300 ring-1 ring-inset ring-emerald-500/25">
                 <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                Autenticado via Steam
+                {me.user.steamId ? "Autenticado via Steam" : "Conta local"}
               </div>
               <div className="mt-2 text-xs text-zinc-500">
                 “AK-47 na mão, lag não.” (ainda)
@@ -120,7 +157,7 @@ export default function QueuePage() {
         </div>
 
         {/* Servers */}
-        <ServersSection apiUrl={apiUrl} />
+        <ServersSection apiUrl={apiUrl} token={token || ""} />
 
       </div>
     </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import { useServerLive } from "@/hooks/useServerLive";
 import { useMemo, useState } from "react";
 
 export type ServerMode = "MIX" | "RETAKE" | "DM";
@@ -17,6 +16,13 @@ export type ServerDTO = {
   playerCount?: number | null;
 };
 
+type ServerCardProps = {
+  server: ServerDTO;
+  live?: {
+    playerCount: number;
+    online: boolean;
+  };
+};
 function modeLabel(mode: ServerMode) {
   switch (mode) {
     case "MIX":
@@ -44,12 +50,10 @@ function modePillClasses(mode: ServerMode) {
   }
 }
 
-export default function ServerCard({ server }: { server: ServerDTO }) {
+export default function ServerCard({ server, live }: ServerCardProps) {
   const [copied, setCopied] = useState(false);
-  const live = useServerLive(server.id);
-
   const playerCount = live?.playerCount ?? server.playerCount ?? 0;
-  const online = live?.online ?? true;
+  const online = live?.online ?? false;
 
   const address = useMemo(() => `${server.ip}:${server.port}`, [server.ip, server.port]);
   const connectCmd = useMemo(() => `connect ${address}; password ${server.password}`, [address, server.password]);

@@ -34,3 +34,23 @@ model Server {
 
   @@unique([ip, port])
 }
+model User {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Identidades
+  steamId          String?  @unique
+  email            String?  @unique
+  passwordHash     String?
+
+  // Perfil
+  displayName      String?
+  avatarUrl        String?
+  nickname         String?  // ou "nome" do seu cadastro
+  phone            String?
+  profileCompleted Boolean  @default(false)
+
+  // Controle
+  isBanned         Boolean  @default(false)
+}

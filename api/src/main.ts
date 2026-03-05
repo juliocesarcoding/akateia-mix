@@ -5,7 +5,8 @@ import passport from 'passport';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  const server = app.getHttpAdapter().getInstance();
+  server.set('trust proxy', 1);
   app.enableCors({
     origin: 'http://localhost:3000',
     credentials: true,

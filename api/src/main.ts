@@ -8,8 +8,13 @@ async function bootstrap() {
   const server = app.getHttpAdapter().getInstance();
   server.set('trust proxy', 1);
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: [
+      'http://localhost:3000',
+      'https://web-akteia-production.up.railway.app',
+    ],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   app.use(

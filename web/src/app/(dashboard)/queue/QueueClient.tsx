@@ -130,7 +130,7 @@ export default function QueuePage() {
             <div className="mt-5 flex flex-wrap gap-3">
               <button
                 className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 px-5 py-2.5 text-sm font-semibold text-black hover:from-orange-400 hover:to-amber-300 active:scale-[0.99]"
-                onClick={() => alert("Próximo passo: implementar /queue/join no backend")}
+                onClick={() => alert("Em breve: entrar na fila, matchmaking e tudo mais. Por enquanto, clique em Copiar Connect")}
               >
                 Entrar na fila
               </button>

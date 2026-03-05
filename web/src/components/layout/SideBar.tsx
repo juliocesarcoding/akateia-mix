@@ -2,13 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { logout } from "@/services/auth";
+import { useRouter } from "next/navigation";
 
 type NavItem = {
   label: string;
-  href: string;
+  href?: string;
   external?: boolean;
   badge?: string;
+  onClick?: () => void;
+  variant?: "danger" | "default";
 };
 
 function cx(...classes: Array<string | false | null | undefined>) {
@@ -17,16 +21,23 @@ function cx(...classes: Array<string | false | null | undefined>) {
 
 export default function Sidebar({ discordUrl }: { discordUrl: string }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [openMobile, setOpenMobile] = useState(false);
+  const handleLogout = useCallback(() => {
+    logout();
+    router.replace("/login");
+    router.refresh();
+  }, [router]);
 
   const items: NavItem[] = useMemo(
     () => [
       { label: "Início", href: "/queue" },
+      { label: "Completar cadastro", href: "/complete-profile" },
       { label: "Seja Premium", href: "/seja-premium", badge: "NEW" },
-      { label: "Ajuda", href: "/ajuda" },
       { label: "Discord", href: "/discord" },
+      { label: "Sair", onClick: handleLogout, variant: "danger" as const, href: "/login" },
     ],
-    []
+    [handleLogout]
   );
 
   function isActive(item: NavItem) {
@@ -121,7 +132,7 @@ export default function Sidebar({ discordUrl }: { discordUrl: string }) {
             ) : (
               <Link
                 key={item.label}
-                href={item.href}
+                href={item.href || ""}
                 className={cx(base, active ? activeCls : inactive)}
                 onClick={() => setOpenMobile(false)}
               >

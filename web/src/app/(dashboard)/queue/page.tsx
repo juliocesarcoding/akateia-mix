@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ServersSection from "@/components/ServersSection";
-import { useRouter } from "next/router";
-import { useSearchParams } from "next/dist/client/components/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 
 

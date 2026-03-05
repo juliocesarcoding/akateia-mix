@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import ServersSection from "@/components/ServersSection";
+import { useRouter } from "next/router";
+import { useSearchParams } from "next/dist/client/components/navigation";
 
 
 
@@ -25,7 +27,21 @@ export default function QueuePage() {
     typeof window !== "undefined"
       ? localStorage.getItem("auth_token")
       : null;
+  const router = useRouter();
+  const sp = useSearchParams();
+  const tokenFromQuery = sp.get("token");
+  useEffect(() => {
+    if (!tokenFromQuery) return;
 
+    try {
+      localStorage.setItem("auth_token", tokenFromQuery);
+      // limpa a URL (remove token)
+      router.replace("/queue");
+    } catch {
+      // ignore
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tokenFromQuery]);
   useEffect(() => {
     async function run() {
       const token =

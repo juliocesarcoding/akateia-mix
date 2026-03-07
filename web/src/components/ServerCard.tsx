@@ -54,6 +54,7 @@ export default function ServerCard({ server, live }: ServerCardProps) {
   const [copied, setCopied] = useState(false);
   const playerCount = live?.playerCount ?? server.playerCount ?? 0;
   const online = live?.online ?? false;
+  const cs2Url = `steam://connect/${server.ip}:${server.port}/${server.password}`;
 
   const address = useMemo(() => `${server.ip}:${server.port}`, [server.ip, server.port]);
   const connectCmd = useMemo(() => `connect ${address}; password ${server.password}`, [address, server.password]);
@@ -117,7 +118,7 @@ export default function ServerCard({ server, live }: ServerCardProps) {
         </div>
 
         <div className="flex shrink-0 flex-col gap-2">
-          {/* <a
+          <a
             href={cs2Url}
             className={`inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-semibold text-black active:scale-[0.99] ${server.isActive
               ? "bg-gradient-to-r from-orange-500 to-amber-400 hover:from-orange-400 hover:to-amber-300"
@@ -126,7 +127,7 @@ export default function ServerCard({ server, live }: ServerCardProps) {
             title={server.isActive ? "Abrir CS2 e conectar" : "Servidor offline"}
           >
             Abrir no CS2
-          </a> */}
+          </a>
 
           <button
             onClick={handleCopy}
